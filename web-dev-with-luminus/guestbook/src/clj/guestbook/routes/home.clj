@@ -7,10 +7,13 @@
    [ring.util.response]
    [ring.util.http-response :as response]))
 
-
+(declare home-page-message)
 
 (defn home-page [request]
-  (layout/render request "home.html" {:docs (-> "docs/docs.md" io/resource slurp)}))
+  (layout/render request "home.html" {:messages (home-page-message)}))
+
+(defn home-page-message []
+  (db/get-messages))
 
 (defn about-page [request]
   (layout/render request "about.html"))
