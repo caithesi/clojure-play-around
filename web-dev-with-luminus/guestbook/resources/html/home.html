@@ -19,6 +19,23 @@
           </ul>
         </div>
       </div>
+
+      <div class="columns">
+        <div class="column">
+          <form method="POST" action="/message">
+            {% csrf-field %}
+            <div class="field">
+              <label class="label" for="name"> Name </label>
+              <input class="input" type="text" name="name" value="{{name}}" />
+            </div>
+            <div class="field">
+              <label class="label" for="message"> Message </label>
+              <textarea class="textarea" name="message">{{message}}</textarea>
+            </div>
+            <input type="submit" class="button is-primary" value="comment" />
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </div>

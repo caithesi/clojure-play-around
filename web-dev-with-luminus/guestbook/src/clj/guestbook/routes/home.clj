@@ -18,11 +18,16 @@
 (defn about-page [request]
   (layout/render request "about.html"))
 
+(defn save-message [{:keys [params], :as request} ]
+  (db/save-message! params)
+  (response/found "/"))
+
 (defn home-routes []
   [ "" 
    {:middleware [middleware/wrap-csrf
                  middleware/wrap-formats
                  ]}
    ["/" {:get home-page}]
-   ["/about" {:get about-page}]])
+   ["/about" {:get about-page}]
+   ["/message" {:post save-message}]])
 
