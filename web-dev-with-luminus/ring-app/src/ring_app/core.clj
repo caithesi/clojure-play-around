@@ -2,7 +2,7 @@
   (:require [ring.adapter.jetty :as jetty]
             [clojure.data.json :as json]
             [ring.middleware.reload :refer [wrap-reload]]
-            [ring.util.response :as response]))
+            [ring.util.http-response :as response]))
 
 
 (defn wrap-nocache [handler]
@@ -21,14 +21,15 @@
    {:name "yiyang"}))
 
 (defn handler [request-map]
-  (response/response
+  (response/ok
    (test-json)))
 
 
 (defn -main [& args]
   (jetty/run-jetty
-   (-> handler
-       wrap-nocache)
+   (-> #'handler
+       wrap-nocache
+       wrap-reload)
    {:port 3000
     :join? false}))
 
