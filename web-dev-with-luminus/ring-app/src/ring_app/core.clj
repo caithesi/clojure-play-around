@@ -1,8 +1,10 @@
 (ns ring-app.core
-  (:require [ring.adapter.jetty :as jetty]
-            [clojure.data.json :as json]
-            [ring.middleware.reload :refer [wrap-reload]]
-            [ring.util.http-response :as response]))
+  (:require
+   [muuntaja.middleware :as muuntaja]
+   [ring.adapter.jetty :as jetty]
+   [clojure.data.json :as json]
+   [ring.middleware.reload :refer [wrap-reload]]
+   [ring.util.http-response :as response]))
 
 
 (defn wrap-nocache [handler]
@@ -20,15 +22,28 @@
   (json/write-str
    {:name "yiyang"}))
 
-(defn handler [request-map]
+(defn html-handler [request-map]
   (response/ok
-   (test-json)))
+   (resp-content request-map)))
 
+(defn json-handler [request]
+  (println request)
+  (println "get some thing")
+  (println (get-in request [:body-params :id]))
+  (response/ok
+   {:result (get-in request [:body-params :id])}))
+
+(def handler json-handler)
+
+(defn wrap-formats [handler]
+  (-> handler
+      (muuntaja/wrap-format)))
 
 (defn -main [& args]
   (jetty/run-jetty
    (-> #'handler
        wrap-nocache
+       wrap-formats
        wrap-reload)
    {:port 3000
     :join? false}))
