@@ -6,7 +6,9 @@
    [ring.middleware.reload :refer [wrap-reload]]
    [ring.util.http-response :as response]))
 
-(declare wrap-formats)
+(defn wrap-formats [handler]
+  (-> handler
+      (muuntaja/wrap-format)))
 
 (defn wrap-nocache [handler]
   (fn [request]
@@ -31,6 +33,13 @@
   (response/ok
    {:result (get-in request [:body-params :id])}))
 
+(defn api-handler [middleware]
+  ["/api" {:middleware middleware}
+   ["/multiply"
+    {:post
+     (fn [{{:keys [a b]} :body-params}]
+       (response/ok {:result (* a b)}))}]])
+
 (def routes
   [["/" {:get html-handler}]
    ["/echo/:id"
@@ -43,13 +52,20 @@
       (fn [{{:keys [a b]} :body-params}]
         (response/ok {:result (* a b)}))}]]])
 
+(def routes-test
+  (let [api (api-handler [wrap-formats])]
+    [["/" {:get html-handler}]
+     ["/echo/:id"
+      {:get
+       (fn [{{:keys [id]} :path-params}]
+         (response/ok (str "<p>the value is: " id "</p>")))}]
+     api]))
+
 (def handler
   (reitit/ring-handler
-   (reitit/router routes)))
+   (reitit/router routes-test)))
 
-(defn wrap-formats [handler]
-  (-> handler
-      (muuntaja/wrap-format)))
+
 
 (defn -main [& args]
   (jetty/run-jetty
