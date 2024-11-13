@@ -40,6 +40,14 @@
      (fn [{{:keys [a b]} :body-params}]
        (response/ok {:result (* a b)}))}]])
 
+(defn default-handler []
+  {:not-found
+   (constantly (response/not-found "404 - Page not found"))
+   :method-not-allowed
+   (constantly (response/method-not-allowed "405 - Not allowed"))
+   :not-acceptable
+   (constantly (response/not-acceptable "406 - Not acceptable"))})
+
 (def routes
   [["/" {:get html-handler}]
    ["/echo/:id"
@@ -63,7 +71,8 @@
 
 (def handler
   (reitit/ring-handler
-   (reitit/router routes-test)))
+   (reitit/router routes-test)
+   (reitit/create-default-handler (default-handler))))
 
 
 
