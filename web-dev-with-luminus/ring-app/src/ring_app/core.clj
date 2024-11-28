@@ -72,7 +72,9 @@
 (def handler
   (reitit/ring-handler
    (reitit/router routes-test)
-   (reitit/create-default-handler (default-handler))))
+   (reitit/routes
+    (reitit/create-resource-handler {:path "/"})
+    (reitit/create-default-handler (default-handler)))))
 
 
 
